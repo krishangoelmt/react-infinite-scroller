@@ -106,6 +106,7 @@ var InfiniteScroll = (function(_Component) {
       key: 'componentDidMount',
       value: function componentDidMount() {
         this.pageLoaded = this.props.pageStart;
+        this.page = this.props.page;
         this.options = this.eventListenerOptions();
         this.attachScrollListener();
       }
@@ -121,7 +122,14 @@ var InfiniteScroll = (function(_Component) {
             this.beforeScrollTop;
           this.loadMore = false;
         }
-        this.attachScrollListener();
+        if (this.props.page < this.page) {
+          // component has been reloaded (mostly by sort order change)
+          this.page = this.props.page;
+          this.detachScrollListener();
+        } else if (this.props.page > this.page) {
+          this.page = this.props.page;
+          this.attachScrollListener();
+        }
       }
     },
     {
@@ -362,6 +370,7 @@ var InfiniteScroll = (function(_Component) {
           useCapture = renderProps.useCapture,
           useWindow = renderProps.useWindow,
           getScrollParent = renderProps.getScrollParent,
+          page = renderProps.page,
           props = _objectWithoutProperties(renderProps, [
             'children',
             'element',
@@ -375,7 +384,8 @@ var InfiniteScroll = (function(_Component) {
             'threshold',
             'useCapture',
             'useWindow',
-            'getScrollParent'
+            'getScrollParent',
+            'page'
           ]);
 
         props.ref = function(node) {
@@ -418,7 +428,8 @@ InfiniteScroll.propTypes = {
   getScrollParent: _propTypes2.default.func,
   threshold: _propTypes2.default.number,
   useCapture: _propTypes2.default.bool,
-  useWindow: _propTypes2.default.bool
+  useWindow: _propTypes2.default.bool,
+  page: _propTypes2.default.number
 };
 InfiniteScroll.defaultProps = {
   element: 'div',

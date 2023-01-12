@@ -15,7 +15,8 @@ export default class InfiniteScroll extends Component {
     getScrollParent: PropTypes.func,
     threshold: PropTypes.number,
     useCapture: PropTypes.bool,
-    useWindow: PropTypes.bool
+    useWindow: PropTypes.bool,
+    page: PropTypes.number
   };
 
   static defaultProps = {
@@ -42,6 +43,7 @@ export default class InfiniteScroll extends Component {
 
   componentDidMount() {
     this.pageLoaded = this.props.pageStart;
+    this.page = this.props.page;
     this.options = this.eventListenerOptions();
     this.attachScrollListener();
   }
@@ -55,7 +57,14 @@ export default class InfiniteScroll extends Component {
         this.beforeScrollTop;
       this.loadMore = false;
     }
-    this.attachScrollListener();
+    if (this.props.page < this.page) {
+      // component has been reloaded (mostly by sort order change)
+      this.page = this.props.page;
+      this.detachScrollListener();
+    } else if (this.props.page > this.page) {
+      this.page = this.props.page;
+      this.attachScrollListener();
+    }
   }
 
   componentWillUnmount() {
@@ -261,6 +270,7 @@ export default class InfiniteScroll extends Component {
       useCapture,
       useWindow,
       getScrollParent,
+      page,
       ...props
     } = renderProps;
 
